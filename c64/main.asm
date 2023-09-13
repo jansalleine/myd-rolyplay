@@ -242,6 +242,8 @@ irq1:               ldx #3
                     sta 0xD020
                     sta 0xD021
                     jsr colorcycle
+                    jsr anim_sprites
+                    jsr change_sprites
                     jmp irq_end
 
 irq2:               ldx #3
@@ -729,47 +731,137 @@ sprites_init:       lda #<sprite_base
                     sta vidmem0+0x3FA
                     sta vidmem0+0x3FB
                     sta vidmem0+0x3FC
-
-                    lda #0x2B
-                    sta 0xD000
-                    lda #0x6D
-                    sta 0xD001
-                    lda #WHITE
+                    lda #BLACK
                     sta 0xD027
-
-                    lda #%00000000
-                    sta 0xD010
-
-                    lda #0x75
-                    sta 0xD003
-                    sta 0xD005
-                    sta 0xD007
-                    sta 0xD009
-
-                    lda #0x30
-                    sta 0xD002
-                    lda #0x40
-                    sta 0xD004
-                    lda #0x50
-                    sta 0xD006
-                    lda #0x60
-                    sta 0xD008
-
-                    lda #RED
                     sta 0xD028
                     sta 0xD029
                     sta 0xD02A
                     sta 0xD02B
-
                     lda #0
                     sta 0xD017
                     sta 0xD01B
                     sta 0xD01C
                     sta 0xD01D
-
+                    jsr fetch_current
+                    jsr place_sprites
+                    rts
+fetch_current:      ldx current_ringtab_pt
+                    lda rand_ringtab,x
+                    sta current_ringtab+0
+                    inx
+                    lda rand_ringtab,x
+                    sta current_ringtab+1
+                    inx
+                    lda rand_ringtab,x
+                    sta current_ringtab+2
+                    inx
+                    lda rand_ringtab,x
+                    sta current_ringtab+3
+                    inx
+                    lda rand_ringtab,x
+                    sta current_ringtab+4
+                    inx
+                    lda rand_ringtab,x
+                    bpl +
+                    ldx #0
++                   stx current_ringtab_pt
+                    rts
+place_sprites:      lda #0
+                    sta d010_val+1
+                    lda current_ringtab
+                    tax
+                    lda spr_ringtab_x,x
+                    sta 0xD000
+                    lda spr_ringtab_y,x
+                    sta 0xD001
+                    lda spr_ringtab_msb,x
+                    beq +
+                    lda #%00000001
+                    sta d010_val+1
++                   lda current_ringtab+1
+                    tax
+                    lda spr_ringtab_x,x
+                    sta 0xD002
+                    lda spr_ringtab_y,x
+                    sta 0xD003
+                    lda spr_ringtab_msb,x
+                    beq +
+                    lda d010_val+1
+                    ora #%00000010
+                    sta d010_val+1
++                   lda current_ringtab+2
+                    tax
+                    lda spr_ringtab_x,x
+                    sta 0xD004
+                    lda spr_ringtab_y,x
+                    sta 0xD005
+                    lda spr_ringtab_msb,x
+                    beq +
+                    lda d010_val+1
+                    ora #%00000100
+                    sta d010_val+1
++                   lda current_ringtab+3
+                    tax
+                    lda spr_ringtab_x,x
+                    sta 0xD006
+                    lda spr_ringtab_y,x
+                    sta 0xD007
+                    lda spr_ringtab_msb,x
+                    beq +
+                    lda d010_val+1
+                    ora #%00001000
+                    sta d010_val+1
++                   lda current_ringtab+4
+                    tax
+                    lda spr_ringtab_x,x
+                    sta 0xD008
+                    lda spr_ringtab_y,x
+                    sta 0xD009
+                    lda spr_ringtab_msb,x
+                    beq d010_val
+                    lda d010_val+1
+                    ora #%00010000
+                    sta d010_val+1
+d010_val:           lda #0
+                    sta 0xD010
                     lda #%00011111
                     sta 0xD015
                     rts
+                    ANIMSPRITESSPEED = 3
+anim_sprites:       lda #ANIMSPRITESSPEED
+                    beq +
+                    dec anim_sprites+1
+                    rts
++                   lda #ANIMSPRITESSPEED
+                    sta anim_sprites+1
+                    ldy #4
+-                   lda current_animtab,y
+                    tax
+                    lda anim_tab,x
+                    sta vidmem0+0x03F8,y
+                    inx
+                    cpx #0x08
+                    bne +
+                    ldx #0
++                   txa
+                    sta current_animtab,y
+                    dey
+                    bpl -
+                    rts
+                    CHANGESPRITESPEED = 6*3
+change_sprites:     lda #CHANGESPRITESPEED
+                    beq +
+                    dec change_sprites+1
+                    rts
++                   lda #CHANGESPRITESPEED
+                    sta change_sprites+1
+                    jsr fetch_current
+                    jsr place_sprites
+                    rts
+anim_tab:           !byte sprite_base, sprite_base+2, sprite_base+1
+                    !byte sprite_base+3, sprite_base+3
+                    !byte sprite_base+1, sprite_base+2, sprite_base
+current_animtab:    !byte 0x00, 0x03, 0x00, 0x04, 0x07
 spr_ringtab_x:      !byte 0x73, 0xE3, 0xB3, 0x03, 0x83
                     !byte 0x23, 0x3B, 0xFB, 0x2B, 0x2B
 spr_ringtab_y:      !byte 0x35, 0x35, 0x3D, 0x3D, 0x45
@@ -788,4 +880,5 @@ rand_ringtab:       !byte 9, 0, 6, 2, 1, 8, 5, 4, 3, 7
                     !byte 5, 3, 9, 7, 2, 0, 1, 8, 4, 6
                     !byte 0xFF
 current_ringtab:    !byte 0x00, 0x00, 0x00, 0x00, 0x00
+current_ringtab_pt: !byte 0x00
 ; ==============================================================================
