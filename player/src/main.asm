@@ -104,24 +104,22 @@ POS_TIME            = vidmem0 + 0x355
                     }
 ; ==============================================================================
                     *= data_start
-chardata:           !bin "exochar3a.prg",,2
-src_vid:            !bin "roly_tmp07.scr",16*40
+chardata:           !bin "res/exochar3a.prg",,2
+src_vid:            !bin "res/roly_tmp07.scr",16*40
                     !scr "                                        "
-                    !scr "   prochaine station: village de untz   "
-                    !scr "   "
-                    !fi 40-6, 0
-                    !scr "   "
+                    !scr "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    !fi 40, 0
                     !scr "               use 8580!                "
                     !scr "                                        "
                     !scr "             "
                     ;POS_TIME = vidmem0 + (src_vid - *)
-                    !scr "00:00 / 03:16"
+                    !scr "00:00 / 59:59"
                     !scr "              "
                     !scr "                                        "
                     !scr "                                        "
                     !scr "f1: "
                     !scr "compo / loop  f3: restart  f5: pause"
-src_col:            !bin "roly_tmp07.col",16*40
+src_col:            !bin "res/roly_tmp07.col",16*40
                     !fi 40,0
                     !fi 40,CYAN
                     !fi 40,CYAN
@@ -144,10 +142,10 @@ src_col:            !bin "roly_tmp07.col",16*40
                     !byte %00000000
 ; ==============================================================================
                     *= sprite_data
-                    !bin "overlays.bin"
+                    !bin "res/overlays.bin"
 ; ==============================================================================
                     *= music_init
-                    !bin "village-24.sid",,0x7E
+                    !bin "res/empty.sid",,0x7E
 ; ==============================================================================
                     *= code_start
                     lda #0x7F

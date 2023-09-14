@@ -1,0 +1,12 @@
+# makefile for win32
+
+PREFIX=$(PWD)/../win32/
+SUFFIX=.exe
+
+export CC=i686-w64-mingw32-gcc
+export CFLAGS=-Wall -v -static
+export LIBS=-L/usr/i686-w64-mingw32/lib
+
+RM = rm -f
+
+include Makefile.inc

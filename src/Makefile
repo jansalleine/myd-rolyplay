@@ -1,36 +1,12 @@
-GCC = gcc
-FLAGS = -Wall -v
-FLAGS_STATIC = -static
-DEBUG?=
+# makefile for linux
+
+PREFIX=$(PWD)/../bin/
+SUFFIX=
+
+CC?=gcc
+CFLAGS= -O3 -Wall -v
+
 RM = rm -f
-CP = cp -v -f
 
-WIN_GCC = i686-w64-mingw32-gcc
-WIN_FLAGS = -Wall -v
+include Makefile.inc
 
-OBJECTS=rolyplay.c rolyplay.h
-
-EXOOBJECTS=\
-	exomizer/chunkpool.o \
-	exomizer/exomizer.o \
-	exomizer/match.o \
-	exomizer/optimal.o \
-	exomizer/output.o \
-	exomizer/radix.o \
-	exomizer/search.o \
-	exomizer/sfx64ne.o
-
-all: rolyplay
-
-rolyplay.o: $(OBJECTS)
-	$(GCC) $(FLAGS) $(DEBUG) -c -o $@ $<
-	@echo $(OBJECTS)
-
-rolyplay: rolyplay.o $(EXOOBJECTS)
-	$(GCC) $(FLAGS) $(DEBUG) -o $@ $<
-	$(CP) $@ ../bin/
-
-
-clean:
-	$(RM) rolyplay rolyplay.o
-	$(RM) ../bin/rolyplay
